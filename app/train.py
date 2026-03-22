@@ -1,0 +1,27 @@
+import argparse
+from pathlib import Path
+
+import pandas as pd
+
+from .config import DEFAULT_DATASET_PATH, DEFAULT_EMBEDDINGS_PATH
+from .recommender import MovieRecommender
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Train the Movie Recommender v1 artifact.')
+    parser.add_argument('--dataset', default=str(DEFAULT_DATASET_PATH), help='Path to movies CSV file')
+    parser.add_argument('--output', default=str(DEFAULT_EMBEDDINGS_PATH), help='Output path for serialized model')
+    args = parser.parse_args()
+
+    dataset_path = Path(args.dataset)
+    if not dataset_path.exists():
+        raise FileNotFoundError(f'Dataset not found: {dataset_path}')
+
+    df = pd.read_csv(dataset_path)
+    recommender = MovieRecommender().fit(df)
+    recommender.save(args.output)
+    print(f'Saved trained artifact to {args.output}')
+
+
+if __name__ == '__main__':
+    main()
