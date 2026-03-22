@@ -1,10 +1,16 @@
+from __future__ import annotations
+
 import argparse
 from pathlib import Path
 
-import pandas as pd
-
-from .config import DEFAULT_DATASET_PATH, DEFAULT_EMBEDDINGS_PATH
-from .recommender import MovieRecommender
+try:
+    from app.config import DEFAULT_DATASET_PATH, DEFAULT_EMBEDDINGS_PATH
+    from app.io_utils import read_movies_csv
+    from app.recommender import MovieRecommender
+except ModuleNotFoundError:
+    from config import DEFAULT_DATASET_PATH, DEFAULT_EMBEDDINGS_PATH
+    from io_utils import read_movies_csv
+    from recommender import MovieRecommender
 
 
 def main():
@@ -17,7 +23,7 @@ def main():
     if not dataset_path.exists():
         raise FileNotFoundError(f'Dataset not found: {dataset_path}')
 
-    df = pd.read_csv(dataset_path)
+    df = read_movies_csv(dataset_path)
     recommender = MovieRecommender().fit(df)
     recommender.save(args.output)
     print(f'Saved trained artifact to {args.output}')

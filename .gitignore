@@ -1,0 +1,6 @@
+data/
+*.csv
+*.parquet
+*.feather
+*.h5
+*.jsonl
