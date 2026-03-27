@@ -4,3 +4,6 @@ data/
 *.feather
 *.h5
 *.jsonl
+
+models/
+*.pkl
