@@ -1,6 +1,6 @@
 # Movie Recommender v1
 
-This is a practical v1 implementation of the proposal: a Dockerized Streamlit app that lets a user:
+This is a practical v1 implementation of a Dockerized Streamlit app that lets a user:
 
 1. Pick up to 3 genres
 2. Generate a candidate pool of recent popular movies
@@ -78,4 +78,4 @@ python -m app.train --dataset data/movies.csv --output models/movie_features.pkl
 - Add negative-pair generation from metadata overlap rules
 - Add nDCG@10, Recall@10, and Hit Rate@10 evaluation scripts
 - Add explanation cards showing top matching genres, cast, and keywords
-- Add optional streaming availability metadata if you later decide to use an API
+- Add optional streaming availability metadata if needed for a suggestions API
