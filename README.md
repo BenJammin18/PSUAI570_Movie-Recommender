@@ -1,15 +1,20 @@
-# Movie Recommender v1
+# Movie Recommender v5
 
-This is a practical v1 implementation of a Dockerized Streamlit app that lets a user:
+This is a Dockerized Streamlit movie recommender that lets a user:
 
 1. Pick up to 3 genres
 2. Generate a candidate pool of recent popular movies
 3. Pick 3 to 5 favorite movies
 4. Receive 5 to 15 ranked recommendations
 
-## What v1 does
+## Runtime mode
 
-This MVP uses a strong metadata baseline instead of a full contrastive PyTorch training pipeline. That keeps v1 easy to run locally while matching the core product flow from the proposal. The architecture is intentionally split so you can swap in a learned embedding model in v2 without reworking the UI.
+The app now starts in deep hybrid mode by default:
+
+- Docker installs the PyTorch dependency during image build
+- App startup expects a deep-learning artifact
+- If it finds an older baseline-only artifact, it rebuilds it as a deep model before serving
+- `app.train` still exists if you want to prebuild the artifact manually
 
 ### Current scoring
 - TF-IDF on combined movie profile text:
@@ -27,7 +32,7 @@ This MVP uses a strong metadata baseline instead of a full contrastive PyTorch t
   - release year
   - vote average
   - vote count
-- Cosine similarity between the averaged seed vector and the full movie catalog
+- Neural embedding similarity on top of the baseline feature space
 
 ## Expected dataset columns
 The app is flexible, but best results come from a CSV with these columns:
@@ -51,11 +56,11 @@ List-like columns can be Python-list style, JSON-ish arrays of dicts, or comma-s
 ## Run locally with Docker
 
 ```bash
-docker build -t movie-recommender-v1 .
+docker build -t movie-recommender-v5 .
 docker run --rm -p 8501:8501 \
   -v $(pwd)/data:/app/data \
   -v $(pwd)/models:/app/models \
-  movie-recommender-v1
+  movie-recommender-v5
 ```
 
 Then open `http://localhost:8501`.
@@ -66,16 +71,23 @@ Then open `http://localhost:8501`.
 docker compose up --build
 ```
 
+The first startup may take longer because the app can train and save the deep artifact if it is missing.
+
 ## Train a reusable artifact ahead of time
 
+Install deep-learning dependencies first:
+
 ```bash
-python -m app.train --dataset data/movies.csv --output models/movie_features.pkl
+pip install -r requirements.txt -r requirements-deep.txt
 ```
 
-## Suggested v2 upgrades
+```bash
+python -m app.train --dataset data/movies.csv --output models/movie_features_v5.pkl
+```
 
-- Replace TF-IDF with a PyTorch encoder and contrastive loss
-- Add negative-pair generation from metadata overlap rules
-- Add nDCG@10, Recall@10, and Hit Rate@10 evaluation scripts
-- Add explanation cards showing top matching genres, cast, and keywords
-- Add optional streaming availability metadata if needed for a suggestions API
+## Suggested upgrades
+
+- Add evaluation metrics such as nDCG@10, Recall@10, and Hit Rate@10
+- Add richer explanation cards for cast, keywords, and genre overlap
+- Add a lightweight training-progress indicator for first-run model builds
+- Add optional streaming availability metadata if you later want provider-aware recommendations

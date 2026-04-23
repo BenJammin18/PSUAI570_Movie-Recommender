@@ -14,7 +14,7 @@ except ModuleNotFoundError:
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Train the Movie Recommender v1 artifact.')
+    parser = argparse.ArgumentParser(description='Train the Movie Recommender v5 artifact.')
     parser.add_argument('--dataset', default=str(DEFAULT_DATASET_PATH), help='Path to movies CSV file')
     parser.add_argument('--output', default=str(DEFAULT_EMBEDDINGS_PATH), help='Output path for serialized model')
     args = parser.parse_args()
@@ -24,7 +24,12 @@ def main():
         raise FileNotFoundError(f'Dataset not found: {dataset_path}')
 
     df = read_movies_csv(dataset_path)
-    recommender = MovieRecommender().fit(df)
+    recommender = MovieRecommender().fit(df, enable_deep_training=True)
+    if not recommender.uses_deep_model:
+        raise RuntimeError(
+            'Deep-model training dependencies are not available. '
+            'Install the base requirements plus requirements-deep.txt before running app.train.'
+        )
     recommender.save(args.output)
     print(f'Saved trained artifact to {args.output}')
 

@@ -1,0 +1,16 @@
+.git
+.gitignore
+.DS_Store
+.vscode
+__pycache__/
+*.pyc
+
+data/
+models/
+
+*.pkl
+*.csv
+*.parquet
+*.feather
+*.h5
+*.jsonl
